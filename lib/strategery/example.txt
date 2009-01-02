@@ -1,0 +1,110 @@
+<pre>
+  require 'strategery'
+  include SVM
+  
+  data = Transformer::CSV.load('traning_example.csv')
+  model = Workflow.process(data)
+  
+  Transformer::CSV.each_line do |line|
+    puts model.predict_probability(line)
+  end
+</pre>
+
+There are a couple ideas here that have some merit:
+
+* Transformer
+* Workflow
+* Less Obvious Innovations
+
+h2. Transformer
+
+Transformer manages important parts of the extract, transform, and load process (ETL).  It's just a beginning, but it handles the important transform into token-count data that the classifier needs.  So, if we're classifying documents, a count of tokens is sent as a representation of the document.  I've implemented a CSV transformer.  I think we need a good ActiveRecord and DataMapper transformer, possibly something for CouchDB as well.  We'll see. 
+
+h2. Workflow
+
+It's not enough to classify data.  It should be scaled and cross-validated.  There's 5 good steps for training and testing that need to be handled every time you address a fresh data set.  So, this brings it all in house and just handles it. 
+
+h2. Less Obvious Innovations
+
+Behind the scenes, I've come up with a few more ideas that help keep the library out of the way of my work:
+
+* A record-grained import function for handling online functions
+* 
+
+
+
+=================================
+
+
+
+  labels = [1, 1, 0, 1, 1, 0, 0]
+ 
+  documents = [
+    %w[FREE NATIONAL TREASURE],   	# Spam
+    %w[FREE TV for EVERY visitor],	# Spam
+    %w[Peter and Stewie are hilarious], # OK
+    %w[AS SEEN ON NATIONAL TV],		# SPAM
+    %w[FREE drugs],			# SPAM
+    %w[New episode rocks, Peter and Stewie are hilarious], # OK
+    %w[Peter is my fav!]		# OK
+    # ...
+  ]
+ 
+  test_labels = [1, 0, 0]
+ 
+  test_documents = [
+    %w[FREE lotterry for the NATIONAL TREASURE !!!], # Spam
+    %w[Stewie is hilarious],		# OK
+    %w[Poor Peter ... hilarious],	# OK
+    # ...
+  ]
+ 
+dictionary = (documents+test_documents).flatten.uniq
+feature_vectors = documents.map { |doc| dictionary.map{|x| doc.include?(x) ? 1 : 0} }
+test_vectors = test_documents.map { |doc| dictionary.map{|x| doc.include?(x) ? 1 : 0} }
+
+require 'SVM' 
+include SVM
+ 
+# Define kernel parameters -- we'll stick with the defaults
+pa = Parameter.new
+pa.C = 100
+pa.svm_type = NU_SVC
+pa.degree = 1
+pa.coef0 = 0
+pa.eps= 0.001
+ 
+sp = Problem.new
+ 
+# Add documents to the training set
+labels.each_index { |i| sp.addExample(labels[i], feature_vectors[i]) }
+ 
+# We're not sure which Kernel will perform best, so let's give each a try
+kernels = [ LINEAR, POLY, RBF, SIGMOID ]
+kernel_names = [ 'Linear', 'Polynomial', 'Radial basis function', 'Sigmoid' ]
+ 
+kernels.each_index { |j|
+  # Iterate and over each kernel type
+  pa.kernel_type = kernels[j]
+  m = Model.new(sp, pa)
+  errors = 0
+ 
+  # Test kernel performance on the training set
+  labels.each_index { |i|
+    pred, probs = m.predict_probability(feature_vectors[i])
+    puts "Prediction: #{pred}, True label: #{labels[i]}, Kernel: #{kernel_names[j]}"
+    errors += 1 if labels[i] != pred
+  }
+  puts "Kernel #{kernel_names[j]} made #{errors} errors on the training set"
+ 
+  # Test kernel performance on the test set
+  errors = 0
+  test_labels.each_index { |i|
+    pred, probs = m.predict_probability(test_vectors[i])
+    puts "\\t Prediction: #{pred}, True label: #{test_labels[i]}"
+    errors += 1 if test_labels[i] != pred
+  }
+ 
+  puts "Kernel #{kernel_names[j]} made #{errors} errors on the test set \\n\\n"
+}
+ 
