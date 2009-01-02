@@ -1,0 +1,43 @@
+= Strategery
+
+git clone git://github.com/urug/strategery.git  
+
+== DESCRIPTION:
+
+This is the project that the Utah Ruby Users Group has been working on. The plan is to:
+
+* Implement some better practices with Ruby SVM
+* Replace the libsvm code with RNum-dependent code
+
+The name strategery is a Bush-ism, an effort to create meaning where maybe none existed.  We hope that your classifications actually make sense.
+
+== FEATURES/PROBLEMS:
+
+* An interface for training, scaling, cross-validating, and testing an SVM.
+* A transform interface for creating SVM-ready data.
+* A workflow tool for automatically classifying typical data sets.
+
+== SYNOPSIS:
+
+  require 'strategery'
+  include SVM
+  
+  data = Transformer::CSV.load('traning_example.csv')
+  model = Workflow.process(data)
+  
+  Transformer::CSV.each_line do |line|
+    puts model.predict_probability(line)
+  end
+
+There are more examples in the examples directory.
+
+== REQUIREMENTS:
+
+* libsvm
+* Ruby SVM
+
+== INSTALL:
+* gem sources -a http://gems.github.com (you only have to do this once)
+* sudo gem install urug-strategery
+
+Special thanks to Rudi Cilibrasi (cilibrar@cilibrar.com) who wrote the Ruby SVM binding.
