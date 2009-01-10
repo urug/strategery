@@ -2,7 +2,7 @@ require File.dirname(__FILE__) + '/../spec_helper'
 
 include SVM::Transformer
 describe CSV do
-  before(:all) do
+  before(:each) do
     @contents = [%w(this that), %w(this other)]
     FasterCSV.stub!(:open).and_return(@contents)
     @filename = 'test_filename'

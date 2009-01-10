@@ -1,6 +1,18 @@
 module SVM #:nodoc:
   module Transformer #:nodoc:
-    
+    # Kind of weird.  Want to just store this in SVM, but want to know how
+    # to find the configuration. 
+    class << SVM
+      def transformer=(obj)
+        @@transformer = obj
+      end
+      alias :default_transformer= :transformer=
+      
+      def transformer
+        @@transformer
+      end
+      alias :default_transformer :transformer
+    end
   end
 end
 
