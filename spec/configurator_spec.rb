@@ -20,5 +20,11 @@ describe "Configurator.run" do
     SVM.default_transformer.should eql(transformer)
   end
   
+  it "should be able to set the default repository" do
+    repository = Repository::Array.new
+    Configurator.run {|svm| svm.default_repository = repository}
+    SVM.default_repository.should eql(repository)
+  end
+  
 end
 

@@ -4,10 +4,14 @@ git clone git://github.com/urug/strategery.git
 
 == DESCRIPTION:
 
-This is the project that the Utah Ruby Users Group has been working on. The plan is to:
+This is the project that the Utah Ruby Users Group has been working on with our hack nights. The plan has changed a bit, and unfortunately the code looks like a sausage recipe with footnotes.  But it's coming along.  I've written a newbie-introduction to SVM that I think covers the salient facts without getting too bogged down into the details.  You can find it at blog.teguhub.com.  As for now, the goal of this project is to build a useful interface for Ruby SVM that will get all of the value that is exposed to us from libsvm.  Then, if there's interest, we can go further.  So, we are:
 
-* Implement some better practices with Ruby SVM
-* Replace the libsvm code with RNum-dependent code
+* Building a series of transformers to get data loaded into an SVM model from various stores (CSV, ActiveRecord, DataMapper, and CouchDB for now)
+* Implementing some scaling code to scale the data
+* Integrating various repositories, for discovering good practices at least.  On the table: Arrays, RBTrees, Amalgalites, RNum Vectors
+* Writing a process manager to handle some of the pre-processing (scaling, cross-validating, and transforming)
+
+These problems are semi-general to data analysis and will likely be useful for similar projects.  Certainly there is a lot of cross-pollination between this project and Agency.
 
 The name strategery is a Bush-ism, an effort to create meaning where maybe none existed.  We hope that your classifications actually make sense.
 
